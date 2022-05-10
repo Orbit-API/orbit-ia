@@ -1,3 +1,4 @@
+from matplotlib.style import available
 import schedule
 import time
 import requests
@@ -18,45 +19,60 @@ except:
 def fetch_metrics():
 
    ###TEMPO DE RESPOSTA
-   time_response_request='http://20.106.206.173:9090/api/v1/query?query=irate(http_server_requests_seconds_sum{instance="20.106.206.173:8080", method="GET", exception="None", uri!~".*actuator.*"}[1m]) / irate(http_server_requests_seconds_count{instance="20.106.206.173:8080", exception="None", method="GET", uri!~".*actuator.*"}[1m])'
+   time_response_request='http://20.84.71.186:9090/api/v1/query?query=irate(http_server_requests_seconds_sum{instance="20.106.206.173:8080", method="GET", exception="None", uri!~".*actuator.*"}[1m]) / irate(http_server_requests_seconds_count{instance="20.106.206.173:8080", exception="None", method="GET", uri!~".*actuator.*"}[1m])'
    time_response_register=requests.get(time_response_request).json()
    
 
    ##USO DE CPU
-   cpu_usage_request='http://20.106.206.173:9090/api/v1/query?query=system_cpu_usage{instance="20.106.206.173:8080"}'
+   cpu_usage_request='http://20.84.71.186:9090/api/v1/query?query=system_cpu_usage{instance="20.106.206.173:8080"}'
    cpu_usage_register=requests.get(cpu_usage_request).json()
 
    ###USO TOTAL DE MEMÓRIA
-   memory_used_request='http://20.106.206.173:9090/api/v1/query?query=sum(jvm_memory_used_bytes{instance="20.106.206.173:8080"})*100/sum(jvm_memory_max_bytes{instance="20.106.206.173:8080"})'
+   memory_used_request='http://20.84.71.186:9090/api/v1/query?query=sum(jvm_memory_used_bytes{instance="20.106.206.173:8080"})*100/sum(jvm_memory_max_bytes{instance="20.106.206.173:8080"})'
    memory_used_register=requests.get(memory_used_request).json()
 
    ###USO DE MEMÓRIA HEAP
-   heap_used_request='http://20.106.206.173:9090/api/v1/query?query=sum(jvm_memory_used_bytes{instance="20.106.206.173:8080", area="heap"})*100/sum(jvm_memory_max_bytes{instance="20.106.206.173:8080", area="heap"})'
+   heap_used_request='http://20.84.71.186:9090/api/v1/query?query=sum(jvm_memory_used_bytes{instance="20.106.206.173:8080", area="heap"})*100/sum(jvm_memory_max_bytes{instance="20.106.206.173:8080", area="heap"})'
    heap_used_register=requests.get(heap_used_request).json()
 
    ###USO DE MEMÓRIA NON-HEAP
-   non_heap_used_request='http://20.106.206.173:9090/api/v1/query?query=sum(jvm_memory_used_bytes{instance="20.106.206.173:8080", area="nonheap"})*100/sum(jvm_memory_max_bytes{instance="20.106.206.173:8080", area="nonheap"})'
+   non_heap_used_request='http://20.84.71.186:9090/api/v1/query?query=sum(jvm_memory_used_bytes{instance="20.106.206.173:8080", area="nonheap"})*100/sum(jvm_memory_max_bytes{instance="20.106.206.173:8080", area="nonheap"})'
    non_heap_used_register=requests.get(non_heap_used_request).json()
 
-   trr_ts = 0
-   trr = 0
+   trrg_ts = 0
+   trrg = 0
+   trrp_ts = 0
+   trrp = 0
+   available = 1
+
    for r in time_response_register['data']['result']:
-      if r['metric']['uri'] == '/users':
-         trr_ts = r['value'][0]
-         trr = r['value'][1]
+      if r['metric']['uri'] == '/users' and r['metric']['method'] == 'GET':
+         trrg_ts = r['value'][0]
+         trrg = r['value'][1]
+         if trrg == 'NaN':
+            trrg = 0
+      if r['metric']['uri'] == '/users' and r['metric']['method'] == 'POST':
+         trrp_ts = r['value'][0]
+         trrp = r['value'][1]
+         if trrp == 'NaN':
+            trrp = 0
 
+   if float(trrp) > 20 or float(trrg) > 20:
+      available = 0
 
-   mean_timestamp = (trr_ts + cpu_usage_register['data']['result'][0]['value'][0] + memory_used_register['data']['result'][0]['value'][0] + heap_used_register['data']['result'][0]['value'][0] + non_heap_used_register['data']['result'][0]['value'][0]) / 5
+   # mean_timestamp = (trrp_ts + trrg_ts + cpu_usage_register['data']['result'][0]['value'][0] + memory_used_register['data']['result'][0]['value'][0] + heap_used_register['data']['result'][0]['value'][0] + non_heap_used_register['data']['result'][0]['value'][0]) / 5
 
    register = {
-      "time_response": trr,
+      "time_response_get": trrg,
+      "time_response_post": trrp,
       "cpu_usage": cpu_usage_register['data']['result'][0]['value'][1],
       "memory_used": memory_used_register['data']['result'][0]['value'][1],
       "heap_used": heap_used_register['data']['result'][0]['value'][1],
       "non_heap_used": non_heap_used_register['data']['result'][0]['value'][1],
-      "time": datetime.fromtimestamp(mean_timestamp).isoformat()
+      "time": datetime.fromtimestamp(non_heap_used_register['data']['result'][0]['value'][0]).isoformat(),
+      "available": available
    }
-
+   
    print(register)
    # a = collection.insert_one(register)
    # print(a.inserted_id)
