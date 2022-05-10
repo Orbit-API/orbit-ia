@@ -15,4 +15,4 @@ class Orbit(HttpUser):
     
     @task
     def exibicao(self):
-        self.client.get("/users")
+        self.client.get("/users?size=10&page=1")
