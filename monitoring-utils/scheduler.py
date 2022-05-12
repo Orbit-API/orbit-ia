@@ -1,4 +1,3 @@
-from matplotlib.style import available
 import schedule
 import time
 import requests
