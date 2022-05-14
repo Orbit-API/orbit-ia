@@ -8,7 +8,7 @@ try:
    # con = 'mongodb+srv://mongoadmin:secret@20.84.71.186:27017/orbit'
    mongo_client = MongoClient(host='20.84.71.186', port=27017, username='mongoadmin', password='secret')
    db = mongo_client['orbit']
-   collection = db['metrics_5']
+   collection = db['metrics_7']
    print('conectou')
 
 except:
@@ -18,24 +18,24 @@ except:
 def fetch_metrics():
 
    ###TEMPO DE RESPOSTA
-   time_response_request='http://20.84.71.186:9090/api/v1/query?query=irate(http_server_requests_seconds_sum{instance="b721-2804-18-805-fc5a-dc9e-fabe-a976-f6ec.ngrok.io:80", uri!~".*actuator.*"}[1m]) / irate(http_server_requests_seconds_count{instance="b721-2804-18-805-fc5a-dc9e-fabe-a976-f6ec.ngrok.io:80", uri!~".*actuator.*"}[1m])'
+   time_response_request='http://20.84.71.186:9090/api/v1/query?query=irate(http_server_requests_seconds_sum{instance="c160-2804-18-805-fc5a-dc9e-fabe-a976-f6ec.ngrok.io:80", uri!~".*actuator.*"}[1m]) / irate(http_server_requests_seconds_count{instance="c160-2804-18-805-fc5a-dc9e-fabe-a976-f6ec.ngrok.io:80", uri!~".*actuator.*"}[1m])'
    time_response_register=requests.get(time_response_request).json()
    
 
    ##USO DE CPU
-   cpu_usage_request='http://20.84.71.186:9090/api/v1/query?query=system_cpu_usage{instance="b721-2804-18-805-fc5a-dc9e-fabe-a976-f6ec.ngrok.io:80"}'
+   cpu_usage_request='http://20.84.71.186:9090/api/v1/query?query=system_cpu_usage{instance="c160-2804-18-805-fc5a-dc9e-fabe-a976-f6ec.ngrok.io:80"}'
    cpu_usage_register=requests.get(cpu_usage_request).json()
 
    ###USO TOTAL DE MEMÓRIA
-   memory_used_request='http://20.84.71.186:9090/api/v1/query?query=sum(jvm_memory_used_bytes{instance="b721-2804-18-805-fc5a-dc9e-fabe-a976-f6ec.ngrok.io:80"})*100/sum(jvm_memory_max_bytes{instance="b721-2804-18-805-fc5a-dc9e-fabe-a976-f6ec.ngrok.io:80"})'
+   memory_used_request='http://20.84.71.186:9090/api/v1/query?query=sum(jvm_memory_used_bytes{instance="c160-2804-18-805-fc5a-dc9e-fabe-a976-f6ec.ngrok.io:80"})*100/sum(jvm_memory_max_bytes{instance="c160-2804-18-805-fc5a-dc9e-fabe-a976-f6ec.ngrok.io:80"})'
    memory_used_register=requests.get(memory_used_request).json()
 
    ###USO DE MEMÓRIA HEAP
-   heap_used_request='http://20.84.71.186:9090/api/v1/query?query=sum(jvm_memory_used_bytes{instance="b721-2804-18-805-fc5a-dc9e-fabe-a976-f6ec.ngrok.io:80", area="heap"})*100/sum(jvm_memory_max_bytes{instance="b721-2804-18-805-fc5a-dc9e-fabe-a976-f6ec.ngrok.io:80", area="heap"})'
+   heap_used_request='http://20.84.71.186:9090/api/v1/query?query=sum(jvm_memory_used_bytes{instance="c160-2804-18-805-fc5a-dc9e-fabe-a976-f6ec.ngrok.io:80", area="heap"})*100/sum(jvm_memory_max_bytes{instance="c160-2804-18-805-fc5a-dc9e-fabe-a976-f6ec.ngrok.io:80", area="heap"})'
    heap_used_register=requests.get(heap_used_request).json()
 
    ###USO DE MEMÓRIA NON-HEAP
-   non_heap_used_request='http://20.84.71.186:9090/api/v1/query?query=sum(jvm_memory_used_bytes{instance="b721-2804-18-805-fc5a-dc9e-fabe-a976-f6ec.ngrok.io:80", area="nonheap"})*100/sum(jvm_memory_max_bytes{instance="b721-2804-18-805-fc5a-dc9e-fabe-a976-f6ec.ngrok.io:80", area="nonheap"})'
+   non_heap_used_request='http://20.84.71.186:9090/api/v1/query?query=sum(jvm_memory_used_bytes{instance="c160-2804-18-805-fc5a-dc9e-fabe-a976-f6ec.ngrok.io:80", area="nonheap"})*100/sum(jvm_memory_max_bytes{instance="c160-2804-18-805-fc5a-dc9e-fabe-a976-f6ec.ngrok.io:80", area="nonheap"})'
    non_heap_used_register=requests.get(non_heap_used_request).json()
 
    trrg_ts = 0
