@@ -1,6 +1,5 @@
 
-
-slack_token = 'xoxb-3515796684449-3500999482053-CFgfGqQr5RgJsNV0qmAe1gTy'
-slack_channel = 'orbit'
+slack_token = 'eG94Yi0zNTE1Nzk2Njg0NDQ5LTM1MjExMjAzNjkxNDItSnRnSGswS2JTWXlvREVvT2FrbGkzVURM'
+slack_channel = 'orbit1'
 slack_icon_emoji = ':male_mage:'
-slack_user_name = 'Orbit' 
+slack_user_name = 'Orbit Messenger' 
