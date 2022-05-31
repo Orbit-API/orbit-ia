@@ -5,7 +5,7 @@ import slack_config
 from base64 import b64decode
 from flask import request
 from app import collection
-
+from datetime import datetime
 
 class MessageSlack():
 
@@ -23,8 +23,14 @@ class MessageSlack():
 
     }).json()
 
-  def codigo_etl(mins):
-    texto = f'Risco de Indisponibilidade - daqui a: {mins} minuto(s)'
+  def codigo_etl(mins, risk):
+    time = datetime.now()
+    if mins == 0 or risk == 100:
+      texto = f'*Sistema Indisponível! *  \n *Canal:* {slack_config.slack_channel} \n *Data e Hora: *  {time} :fire: '
+    else:
+      texto = f'*Risco de Indisponibilidade: * {risk}% \n*Previsão de Queda: * {mins} minutos \n*Canal:* {slack_config.slack_channel} \n*Data e Hora: *  {time} :fire: '
+    
+    # texto = f'Risco de Indisponibilidade - daqui a: {mins} minuto(s)'
     return texto
 
   def calculate_mins(units):
@@ -56,12 +62,14 @@ class MessageSlack():
 
     if alert == 1:
       try:
-        slack_info = MessageSlack.codigo_etl(mins)
+        slack_info = MessageSlack.codigo_etl(mins, 30)
         MessageSlack.post_message_to_slack(slack_info)
         
-      except:
+      except Exception as erro:
         slack_info = 'Encontramos problemas ao atualizar os dados :pleading_face:'
         MessageSlack.post_message_to_slack(slack_info)
+        print('************************************************')
+        print(erro)
       
     return body
 

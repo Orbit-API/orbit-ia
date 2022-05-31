@@ -5,7 +5,7 @@ from pymongo import MongoClient
 from datetime import datetime
 
 try:
-   mongo_client = MongoClient(host='20.84.71.186', port=27017, username='mongoadmin', password='secret')
+   mongo_client = MongoClient(host='localhost', port=27017, username='mongoadmin', password='secret')
    db = mongo_client['orbit']
    collection = db['metrics_7']
    print('conectou')
@@ -20,24 +20,24 @@ def send_to_verify(data):
 def fetch_metrics():
 
    ###TEMPO DE RESPOSTA
-   time_response_request='http://20.84.71.186:9090/api/v1/query?query=irate(http_server_requests_seconds_sum{instance="9715-2804-431-c7db-dce0-a17c-a285-d70b-919.ngrok.io:80", uri!~".*actuator.*"}[1m]) / irate(http_server_requests_seconds_count{instance="9715-2804-431-c7db-dce0-a17c-a285-d70b-919.ngrok.io:80", uri!~".*actuator.*"}[1m])'
+   time_response_request='http://localhost:9090/api/v1/query?query=irate(http_server_requests_seconds_sum{instance="localhost:8080", uri!~".*actuator.*"}[1m]) / irate(http_server_requests_seconds_count{instance="localhost:8080", uri!~".*actuator.*"}[1m])'
    time_response_register=requests.get(time_response_request).json()
    
 
    ##USO DE CPU
-   cpu_usage_request='http://20.84.71.186:9090/api/v1/query?query=system_cpu_usage{instance="9715-2804-431-c7db-dce0-a17c-a285-d70b-919.ngrok.io:80"}'
+   cpu_usage_request='http://localhost:9090/api/v1/query?query=system_cpu_usage{instance="localhost:8080"}'
    cpu_usage_register=requests.get(cpu_usage_request).json()
 
    ###USO TOTAL DE MEMÓRIA
-   memory_used_request='http://20.84.71.186:9090/api/v1/query?query=sum(jvm_memory_used_bytes{instance="9715-2804-431-c7db-dce0-a17c-a285-d70b-919.ngrok.io:80"})*100/sum(jvm_memory_max_bytes{instance="9715-2804-431-c7db-dce0-a17c-a285-d70b-919.ngrok.io:80"})'
+   memory_used_request='http://localhost:9090/api/v1/query?query=sum(jvm_memory_used_bytes{instance="localhost:8080"})*100/sum(jvm_memory_max_bytes{instance="localhost:8080"})'
    memory_used_register=requests.get(memory_used_request).json()
 
    ###USO DE MEMÓRIA HEAP
-   heap_used_request='http://20.84.71.186:9090/api/v1/query?query=sum(jvm_memory_used_bytes{instance="9715-2804-431-c7db-dce0-a17c-a285-d70b-919.ngrok.io:80", area="heap"})*100/sum(jvm_memory_max_bytes{instance="9715-2804-431-c7db-dce0-a17c-a285-d70b-919.ngrok.io:80", area="heap"})'
+   heap_used_request='http://localhost:9090/api/v1/query?query=sum(jvm_memory_used_bytes{instance="localhost:8080", area="heap"})*100/sum(jvm_memory_max_bytes{instance="localhost:8080", area="heap"})'
    heap_used_register=requests.get(heap_used_request).json()
 
    ###USO DE MEMÓRIA NON-HEAP
-   non_heap_used_request='http://20.84.71.186:9090/api/v1/query?query=sum(jvm_memory_used_bytes{instance="9715-2804-431-c7db-dce0-a17c-a285-d70b-919.ngrok.io:80", area="nonheap"})*100/sum(jvm_memory_max_bytes{instance="9715-2804-431-c7db-dce0-a17c-a285-d70b-919.ngrok.io:80", area="nonheap"})'
+   non_heap_used_request='http://localhost:9090/api/v1/query?query=sum(jvm_memory_used_bytes{instance="localhost:8080", area="nonheap"})*100/sum(jvm_memory_max_bytes{instance="localhost:8080", area="nonheap"})'
    non_heap_used_register=requests.get(non_heap_used_request).json()
 
    trrg_ts = 0
@@ -82,9 +82,10 @@ def fetch_metrics():
    print(register)
    # a = collection.insert_one(register)
    # print(a.inserted_id)
+
    send_to_verify(register)
 
-schedule.every(20).seconds.do(fetch_metrics)
+schedule.every(10).seconds.do(fetch_metrics)
 
 
 while True:
