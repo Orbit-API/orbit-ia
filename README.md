@@ -1,5 +1,5 @@
 # orbit-ia
-![background-orbit_Prancheta 1](https://user-images.githubusercontent.com/56441318/160112708-193a18fe-2241-427c-8fe0-2dc23324b48a.png)
+![background-orbit-com-slogan](https://user-images.githubusercontent.com/56441318/171164559-775dfbf2-5a23-4b91-b0fb-6318a50cebac.png)
 
 # Modelo CRISP-DM
 O modelo CRISP-DM é uma metodologia que fornece uma abordagem estruturada para processos de mineração de dados, sendo amplamente utilizada devido à sua poderosa praticidade, flexibilidade e utilidade ao usar a análise e a valoração cíclica para resolver problemas complexos.
