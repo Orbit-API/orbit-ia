@@ -45,7 +45,7 @@ class MessageSlack():
     orbit = OrbitIA(
       data=data,
       metrics=body,
-      mins_to_predict=10
+      mins_to_predict=60
     )
 
     availability = OrbitIA.orbit(orbit)

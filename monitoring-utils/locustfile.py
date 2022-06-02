@@ -6,7 +6,7 @@ class Orbit(HttpUser):
     
     @task
     def cadastro(self):
-        self.client.post("/users", {
+        self.client.post("/users", json={
             "name": "Teste Usuário",
             "email": "teste@email.com",
             "password": "passwordteste",

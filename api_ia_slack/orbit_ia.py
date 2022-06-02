@@ -30,7 +30,7 @@ class OrbitIA:
     def metric_exp_predict(self, metric, units_to_predict):
         self.train = self.data[metric][:-units_to_predict]
         self.test = self.data[metric][-units_to_predict:]
-        exp = ExponentialSmoothing(self.train, trend="additive", seasonal="additive",
+        exp = ExponentialSmoothing(self.data[metric], trend="additive", seasonal="additive",
                                     seasonal_periods=units_to_predict).fit(optimized=True)
         metric_preds = exp.forecast(len(self.test))
         return metric_preds
@@ -61,11 +61,16 @@ class OrbitIA:
                 'cpu_usage': float, 'available': float, 'memory_used': float, 
                 'heap_used': float, 'non_heap_used': float})
         i = 0
-        while i < len(df['time_response_get']):
-            if df['time_response_get'][i] > 15 or df['time_response_post'][i] > 25:
-                df['available'][i] = 0
-            else:
-                df['available'][i] = 1
+        while i < len(df['cpu_usage']):
+            col_values = []
+            for column in self.metrics.keys():
+                if column != 'available' and column != 'time':
+                    if df[column][i] != 0:
+                        col_values.append(df[column][i])
+                if len(col_values) == 0:
+                    df['available'][i] = 0
+                else:
+                    df['available'][i] = 1
             i = i + 1
         return df
 
@@ -76,7 +81,7 @@ class OrbitIA:
         results = {n: self.tree_model(n) for n in range(1, max_range)}
         print(*[(n, r['acc']) for n, r in results.items()])
         for prediction in self.prediction:
-            av_prediction.append(self.dtc.predict(pd.DataFrame(prediction)))
+            av_prediction.append(self.dtc.predict_proba(pd.DataFrame(prediction)))
         return av_prediction
 
 
@@ -95,8 +100,12 @@ class OrbitIA:
         test_x, test_y = self.data_target_split(test)
         self.dtc = DecisionTreeClassifier(max_depth=max_depth, random_state=111)
         self.dtc.fit(train_x, train_y)
-        pred_y = self.dtc.predict(test_x)
-        acc = metrics.accuracy_score(test_y, pred_y)
+        pred_y = self.dtc.predict_proba(test_x)
+        # acc = metrics.accuracy_score(test_y, pred_y)
+        # print('--------------------------------------')
+        # print(acc)
+        # print('--------------------------------------')
+        acc = ''
         return {'acc':acc, 'n':max_depth}
 
 
