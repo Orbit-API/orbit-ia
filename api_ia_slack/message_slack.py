@@ -40,8 +40,6 @@ class MessageSlack():
     body = request.get_json()
     data = collection.find()
 
-    print(body)
-
     orbit = OrbitIA(
       data=data,
       metrics=body,
@@ -49,7 +47,6 @@ class MessageSlack():
     )
 
     availability = OrbitIA.orbit(orbit)
-    print(availability)
 
     alert = 0
     units = 0
@@ -68,8 +65,6 @@ class MessageSlack():
       except Exception as erro:
         slack_info = 'Encontramos problemas ao atualizar os dados :pleading_face:'
         MessageSlack.post_message_to_slack(slack_info)
-        print('************************************************')
-        print(erro)
       
     return body
 
