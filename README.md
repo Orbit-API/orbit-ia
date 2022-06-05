@@ -11,10 +11,10 @@ O modelo CRISP-DM é uma metodologia que fornece uma abordagem estruturada para 
 - [x] [Business Understanding](https://github.com/Orbit-API/orbit-docs#backlog-do-produto-resumido): 
 Após o problema geral ser apresentado, foram realizados pesquisas e estudos sobre, além da elaboração de questionamentos para aprofundar o conhecimento da equipe sobre o que realmente atenderia a necessidade do cliente.
 
-- [x] [Data Understanding](https://github.com/Orbit-API/orbit-ia/tree/main/analisys): 
+- [x] [Data Understanding](https://github.com/Orbit-API/orbit-ia/tree/main/analisys/data_understanding): 
 Logo após o entendimento do negócio, foram iniciados os estudos sobre quais dados teriam maior valor para a construção do modelo. Também foram iniciadas pesquisas sobre ferramentas e tecnologias que pudessem ser úteis tanto para a coleta, quanto para o tratamento e armazenamento desses dados.
 
-- [x] [Data Preparation](https://github.com/Orbit-API/orbit-ia/tree/main/analisys/preparation):
+- [x] [Data Preparation](https://github.com/Orbit-API/orbit-ia/tree/main/analisys/data_preparation):
 Com a estruturação do sistema de monitoramento concluída, foi possível captar dados provenientes da aplicação alvo, e armazená-los num banco de dados para uso futuro. Foi medida a correlação de registros de cada métrica escolhida, e os valores distoantes foram ajustados.
 
 - [x] [Modeling](https://github.com/Orbit-API/orbit-ia/blob/main/api_ia_slack/orbit_ia.py):
