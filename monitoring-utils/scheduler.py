@@ -5,9 +5,9 @@ from pymongo import MongoClient
 from datetime import datetime
 
 try:
-   mongo_client = MongoClient(host='localhost', port=27017, username='mongoadmin', password='secret')
+   mongo_client = MongoClient(host='20.84.71.186', port=27017, username='mongoadmin', password='secret')
    db = mongo_client['orbit']
-   collection = db['metrics_7']
+   collection = db['metrics_10']
    print('conectou')
 except:
    print('nao conectou')
@@ -80,12 +80,13 @@ def fetch_metrics():
    }
    
    print(register)
-   # a = collection.insert_one(register)
-   # print(a.inserted_id)
-
    send_to_verify(register)
+   a = collection.insert_one(register)
+   print(a.inserted_id)
 
-schedule.every(10).seconds.do(fetch_metrics)
+   
+
+schedule.every(30).seconds.do(fetch_metrics)
 
 
 while True:

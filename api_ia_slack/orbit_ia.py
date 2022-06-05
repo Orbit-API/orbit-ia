@@ -18,6 +18,13 @@ class OrbitIA:
         self.train : list
         self.prediction : list
         self.dtc = DecisionTreeClassifier
+        self.corr_weights = {
+            'time_response_get': 0.35570470566746554,
+            'time_response_post': 0.3885479724010192, 
+            'memory_used': 0.7943337525975255,
+            'heap_used': 0.7184825696993615, 
+            'non_heap_used': 0.8929562798033213,
+            'cpu_usage': 0.7626769865456956}
 
 
     def adjust_time_units(self, len_data):
@@ -28,6 +35,7 @@ class OrbitIA:
 
 
     def metric_exp_predict(self, metric, units_to_predict):
+        print(units_to_predict)
         self.train = self.data[metric][:-units_to_predict]
         self.test = self.data[metric][-units_to_predict:]
         exp = ExponentialSmoothing(self.data[metric], trend="additive", seasonal="additive",
@@ -61,16 +69,14 @@ class OrbitIA:
                 'cpu_usage': float, 'available': float, 'memory_used': float, 
                 'heap_used': float, 'non_heap_used': float})
         i = 0
-        while i < len(df['cpu_usage']):
-            col_values = []
+        while i < len(df['time_response_get']):
+            available_pct = 0
             for column in self.metrics.keys():
                 if column != 'available' and column != 'time':
-                    if df[column][i] != 0:
-                        col_values.append(df[column][i])
-                if len(col_values) == 0:
-                    df['available'][i] = 0
-                else:
-                    df['available'][i] = 1
+                    metric_percent = (df[column][i] * 99) / df[column][90]
+                    available_pct = available_pct + ((metric_percent * (1 + self.corr_weights[column])) / 2)
+            available_pct = 100 - (available_pct / 6)
+            df['available'][i] = round(available_pct)
             i = i + 1
         return df
 
@@ -81,7 +87,7 @@ class OrbitIA:
         results = {n: self.tree_model(n) for n in range(1, max_range)}
         print(*[(n, r['acc']) for n, r in results.items()])
         for prediction in self.prediction:
-            av_prediction.append(self.dtc.predict_proba(pd.DataFrame(prediction)))
+            av_prediction.append(self.dtc.predict(pd.DataFrame(prediction)))
         return av_prediction
 
 
@@ -100,12 +106,11 @@ class OrbitIA:
         test_x, test_y = self.data_target_split(test)
         self.dtc = DecisionTreeClassifier(max_depth=max_depth, random_state=111)
         self.dtc.fit(train_x, train_y)
-        pred_y = self.dtc.predict_proba(test_x)
-        # acc = metrics.accuracy_score(test_y, pred_y)
-        # print('--------------------------------------')
-        # print(acc)
-        # print('--------------------------------------')
-        acc = ''
+        pred_y = self.dtc.predict(test_x)
+        acc = metrics.accuracy_score(test_y, pred_y)
+        print('--------------------------------------')
+        print(acc)
+        print('--------------------------------------')
         return {'acc':acc, 'n':max_depth}
 
 
